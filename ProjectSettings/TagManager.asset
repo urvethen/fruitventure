@@ -1,0 +1,62 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!78 &1
+TagManager:
+  serializedVersion: 2
+  tags:
+  - Enemy
+  layers:
+  - Default
+  - TransparentFX
+  - Ignore Raycast
+  - 
+  - Water
+  - UI
+  - BackGround
+  - Player
+  - Ground
+  - Platform
+  - Collectable
+  - Box
+  - OnlyGroundCollision
+  - PlayerHitZone
+  - RockHead
+  - Sand
+  - Ice
+  - Swamp
+  - Enemy
+  - EnemyHitZone
+  - EnemyDetectionZone
+  - EnemyBullet
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  m_SortingLayers:
+  - name: Default
+    uniqueID: 0
+    locked: 0
+  - name: BackGround
+    uniqueID: 764327747
+    locked: 0
+  - name: Enemy
+    uniqueID: 652773649
+    locked: 0
+  - name: Player
+    uniqueID: 3611165503
+    locked: 0
+  - name: Level
+    uniqueID: 1720837673
+    locked: 0
+  - name: Collectable
+    uniqueID: 291388903
+    locked: 0
+  - name: upper
+    uniqueID: 479872725
+    locked: 0
