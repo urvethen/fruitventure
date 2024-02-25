@@ -5,6 +5,7 @@ using UnityEngine.Tilemaps;
 
 public class Pathfinding: MonoBehaviour
 {
+    //!Базовый файл для поиска пути в ширину на объекте
     [Header("Создание путевых точек")]
     [SerializeField] Vector2Int worldSize;
     [SerializeField] GameObject waypointsPrefab;
