@@ -11,6 +11,7 @@ public class Pathfinding: MonoBehaviour
     [SerializeField] GameObject waypointsPrefab;
     [SerializeField] Transform waypoints;
     [SerializeField] List<Tilemap> tilemaps = new List<Tilemap>();
+    
     [Header("Параметры работы")]
     [SerializeField] bool isRunning = false;
     [SerializeField] Transform start, end;
@@ -59,6 +60,7 @@ public class Pathfinding: MonoBehaviour
             StartPathfinding();
             CreateRoad();
             route = CreateRoute();
+            ClearWaypoints();
         }
         else
         {
@@ -129,6 +131,17 @@ public class Pathfinding: MonoBehaviour
             route.Add(waypointsRoad[i].RealPosition);
         }
         return route;
+    }
+    private void ClearWaypoints()
+    {
+        foreach (var waypoint in levelMaps.Values)
+        {
+            if (waypoint.isExplored)
+            {
+                waypoint.eploredFrom = null;
+                waypoint.isExplored = false;
+            }
+        }
     }
 
     #region Создание поля точек
