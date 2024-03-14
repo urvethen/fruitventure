@@ -4,7 +4,7 @@ using UnityEngine;
 
 public class Waypoint: MonoBehaviour
 {
-    public Waypoint eploredFrom;
+    public Waypoint exploredFrom;
     public bool isExplored;
     [SerializeField] SpriteRenderer spriteRenderer;
     public Vector3 RealPosition

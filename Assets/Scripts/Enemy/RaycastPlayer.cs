@@ -26,7 +26,7 @@ public class RaycastPlayer: MonoBehaviour
         {
             RaycastHit2D hit = Physics2D.Raycast(new Vector2(transform.position.x + offset.x*transform.localScale.x, transform.position.y + offset.y * transform.localScale.y), Vector2.left * transform.localScale.x, detectionDistance, layers);
             //Debug.DrawRay(new Vector2(transform.position.x + offset.x * transform.localScale.x, transform.position.y + offset.y * transform.localScale.y), Vector2.left * transform.localScale.x * detectionDistance, Color.green);
-            if (hit.collider.CompareTag("Player") && hit.collider !=null)
+            if (hit.collider != null && hit.collider.CompareTag("Player")  )
             {
                 HasTarget = true;
 

@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using Unity.VisualScripting;
 using UnityEngine;
 
 public class BirdFly: MonoBehaviour
@@ -7,34 +8,65 @@ public class BirdFly: MonoBehaviour
     [SerializeField] float cooldown;
     [SerializeField] float speed;
     [SerializeField] ParticleSystem particle;
+    [SerializeField] Transform flag;
+    [SerializeField] SoundManager soundManager;
+    bool isUp = false;
+
+    bool IsUp
+    {
+        get { return isUp; }
+        set 
+        { 
+            if(isUp != value)
+            {
+                isUp = value;
+                StopAllCoroutines();
+                if (value)
+                {                    
+                    StartCoroutine(FlyUp());
+                }
+                else
+                {
+                    StartCoroutine(FlyDown());
+                }
+            } 
+        }
+    }
     // Start is called before the first frame update
     void Start()
     {
-        StartCoroutine(FlyDown());
+        //StartCoroutine(FlyDown());
+        soundManager = SoundManager.Instance;
+    }
+    private void FixedUpdate()
+    {
+        if (flag.gameObject.activeSelf)
+        {
+           IsUp = true;
+        }
+        else
+        {
+            IsUp = false;
+        }
     }
 
     IEnumerator FlyUp()
     {
-        
-        float elapsedTime = 0f;
-        while (elapsedTime < cooldown / 2)
+        particle.Play();
+        soundManager.PlayBirdFly();
+        while (true)
         {
             transform.position = new Vector3(transform.position.x, transform.position.y + speed * Time.deltaTime, transform.position.z);
-            elapsedTime += Time.deltaTime;
+           
             yield return null;
         }
-        StartCoroutine(FlyDown());
     }
     IEnumerator FlyDown()
     {
-        float elapsedTime = 0f;
-        while (elapsedTime < cooldown / 2)
+        while (true)
         {
             transform.position = new Vector3(transform.position.x, transform.position.y - speed * Time.deltaTime, transform.position.z);
-            elapsedTime += Time.deltaTime;
             yield return null;
         }
-        particle.Play();
-        StartCoroutine(FlyUp());
     }
 }

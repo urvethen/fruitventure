@@ -1,6 +1,8 @@
 using System.Collections;
 using System.Collections.Generic;
+using System.Net;
 using UnityEngine;
+using static UnityEngine.UI.Image;
 
 public class TouchingDirections: MonoBehaviour
 {
@@ -19,10 +21,14 @@ public class TouchingDirections: MonoBehaviour
     RaycastHit2D[] iceHits = new RaycastHit2D[5];
     RaycastHit2D[] sandHits = new RaycastHit2D[5];
     RaycastHit2D[] swampHits = new RaycastHit2D[5];
-    void Awake()
+    void Start()
     {
         collide = GetComponent<Collider2D>();
         animator = GetComponentInChildren<Animator>();
+        if (animator == null)
+        {
+            animator = GetComponent<Animator>();
+        }
         if (CompareTag("Player"))
         {
             needDeepCheck = true;
@@ -70,6 +76,7 @@ public class TouchingDirections: MonoBehaviour
         }
         IsOnWall = collide.Cast(WallCheckDirection, groundFilter, wallHits, wallDistance) > 0;
         IsOnCeiling = collide.Cast(Vector2.up, groundFilter, ceilHits, groundDisctance) > 0;
+       // Debug.DrawLine(transform.position, transform.position + transform.forward * wallDistance, Color.red);
         if (needDeepCheck)
         {
 

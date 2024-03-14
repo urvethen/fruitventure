@@ -16,7 +16,7 @@ public class Box: MonoBehaviour
     [Header("Настройки выпадения")]
     [SerializeField] int fruitNumber = 3;
     [SerializeField] GameObject fruitPrefab;
-
+    SoundManager soundManager;
     Animator animator;
     private void Awake()
     {
@@ -63,11 +63,12 @@ public class Box: MonoBehaviour
     private void Start()
     {
         GameManager.Instance.AddBox(transform);
+        soundManager = SoundManager.Instance;
     }
     private void OnTriggerEnter2D(Collider2D collision)
     {
         animator.SetTrigger(AnimationStrings.hit);
-
+        soundManager.PlayBoxInteract();
         if (playerHitLayer == (playerHitLayer | (1 << collision.gameObject.layer)))
         {
             Endurance--;

@@ -19,6 +19,7 @@ public class Blocks : MonoBehaviour
         if (playerHitLayer == (playerHitLayer | (1 << collision.gameObject.layer)) )
         {
             animator.SetTrigger(AnimationStrings.hit_top);
+            SoundManager.Instance.PlayBoxInteract();
             if (transform.position.y < collision.transform.parent.position.y && needJump)
             {
                 collision.gameObject.GetComponentInParent<PlayerMovement>().NeedForceJump();

@@ -380,6 +380,9 @@ MonoBehaviour:
   moveDirectionVector: {x: -1, y: 0}
   isWaiting: 0
   cliffDetection: {fileID: 2355860905864206555}
+  waitTimer: 0.75
+  lockVelocity: 0
+  soundStepCD: 0.31
 --- !u!114 &1041645563287224205
 MonoBehaviour:
   m_ObjectHideFlags: 0

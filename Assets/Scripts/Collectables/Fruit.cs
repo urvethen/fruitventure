@@ -17,6 +17,7 @@ public class Fruit: MonoBehaviour
      */
     [SerializeField] int fruitNumber = 8;
     [SerializeField] bool randomFruit;
+    SoundManager soundManager;
     Animator animator;
     private void Awake()
     {
@@ -29,6 +30,7 @@ public class Fruit: MonoBehaviour
     private void Start()
     {
        StartCoroutine(WaitForNextUpdate());
+        soundManager = SoundManager.Instance;
     }
     IEnumerator WaitForNextUpdate()
     {
@@ -39,6 +41,7 @@ public class Fruit: MonoBehaviour
     {
         if(collision.CompareTag("Player"))
         {
+            soundManager.PlayCollect();
             Destroy(gameObject, 0.5f);
             animator.SetBool(AnimationStrings.isCollected, true);
             GameManager.Instance.WasCollected(transform);

@@ -12,6 +12,8 @@ public class GameManager: MonoBehaviour
     [SerializeField] bool isPaused;
     [SerializeField] Transform playerHolder;
     UIManager uiManager;
+    SaveManager saveManager;
+    SoundManager soundManager;
     #region Синглтон
     public static GameManager _instance;
     public static GameManager Instance { get { return _instance; } }
@@ -34,7 +36,9 @@ public class GameManager: MonoBehaviour
     private void Start()
     {
         uiManager = UIManager.Instance;
-
+        saveManager = SaveManager.Instance;
+        soundManager = SoundManager.Instance;
+        soundManager.PlayRandomSong();
         StartCoroutine(WaitingEndLoading());
     }
     IEnumerator WaitingEndLoading()
@@ -44,6 +48,7 @@ public class GameManager: MonoBehaviour
             if (uiManager.EndLoadScene == null)
             {
                 playerHolder.gameObject.SetActive(true);
+                soundManager.PlayerSpawnSound();
                 if (isGoalCollect)
                 {
                     if (targets.Count > 0)
@@ -76,7 +81,8 @@ public class GameManager: MonoBehaviour
             int nextSceneIndex = SceneManager.GetActiveScene().buildIndex + 1;
             if (nextSceneIndex < SceneManager.sceneCountInBuildSettings)
             {
-                SaveManager.Instance.SaveLastNumber(nextSceneIndex);
+                saveManager.SaveLastNumber(nextSceneIndex);
+                saveManager.SaveLevels();
                 SceneManager.LoadScene(nextSceneIndex);
             }
             else
@@ -86,12 +92,16 @@ public class GameManager: MonoBehaviour
         }
         else
         {
+            saveManager.SaveLastNumber(SceneManager.GetActiveScene().buildIndex);
+            saveManager.SaveLevels();
             SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
         }
     }
     public void RestartLevel()
     {
         uiManager.PrepareToLoad();
+        
+        
         StartCoroutine(WaitingEndPreparingToLoadScene(false));
     }
     public void WasCollected(Transform t)
@@ -100,6 +110,7 @@ public class GameManager: MonoBehaviour
         {
             targets.Remove(t);
             uiManager.ChangeCounter(targets.Count);
+            saveManager.IncreaseFruitCounter(1);
         }
         if (targets.Count <= 0 && isGoalCollect && boxList.Count <= 0)
         {
@@ -148,6 +159,7 @@ public class GameManager: MonoBehaviour
         {
             isWin = value;
             uiManager.PrepareToLoad();
+            soundManager.PlayVictory();
             StartCoroutine(WaitingEndPreparingToLoadScene(true));
 
         }

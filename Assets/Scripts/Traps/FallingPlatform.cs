@@ -11,7 +11,7 @@ public class FallingPlatform : MonoBehaviour
     PlatformEffector2D effector;
     SpriteRenderer spriteRenderer;
     ParticleSystem particle;
-
+    SoundManager soundManager;
     private void Awake()
     {
         animator = GetComponent<Animator>();
@@ -20,7 +20,10 @@ public class FallingPlatform : MonoBehaviour
         spriteRenderer = GetComponent<SpriteRenderer>();
         particle = GetComponentInChildren<ParticleSystem>();
     }
-
+    private void Start()
+    {
+        soundManager = SoundManager.Instance;
+    }
     private void OnTriggerEnter2D(Collider2D collision)
     {
 
@@ -31,9 +34,9 @@ public class FallingPlatform : MonoBehaviour
     IEnumerator WaitToStop()
     {
         yield return new WaitForSeconds(workingTime);
-        print("check");
         animator.SetBool(AnimationStrings.start, false);
         particle.Stop();
+        soundManager.PlayFallingPlatform();
         rb.bodyType = RigidbodyType2D.Dynamic;
         rb.AddTorque(5f);
         //StartCoroutine(Rotate());

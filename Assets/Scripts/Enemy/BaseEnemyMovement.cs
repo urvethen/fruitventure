@@ -13,10 +13,14 @@ public class BaseEnemyMovement: MonoBehaviour
     Rigidbody2D rb;
     TouchingDirections touchingDirections;
     Animator animator;
-    Coroutine waitingCoroutine;
+    Coroutine waitingCoroutine, moveSoundCoroutine;
     [SerializeField] bool isWaiting = false;
     [SerializeField] DetectionZone cliffDetection;
-
+    [SerializeField] float waitTimer = 0.75f;
+    [SerializeField] public bool lockVelocity = false;
+    [SerializeField] float soundStepCD = 0.2f;
+    SoundManager soundManager;
+    
     private void Awake()
     {
         rb = GetComponent<Rigidbody2D>();
@@ -30,32 +34,48 @@ public class BaseEnemyMovement: MonoBehaviour
         {
             FlipDirection();
         }
+        soundManager = SoundManager.Instance;
     }
 
     // Update is called once per frame
     void FixedUpdate()
     {
-        if ((touchingDirections.IsOnWall || cliffDetection.colliders.Count == 0) && waitingCoroutine == null)
+        if (touchingDirections.IsGrounded)
         {
-            waitingCoroutine = StartCoroutine(WaitingToFlip(0.75f));
-        }
-        if (!isWaiting && !animator.GetBool(AnimationStrings.hasTarget) && animator.GetBool(AnimationStrings.canMove))
-        {
-            rb.velocity = new Vector2(speed * moveDirectionVector.x, rb.velocity.y);
-        }
-        else
-        {
-            rb.velocity = new Vector2(0, rb.velocity.y);
-        }
+            if ((touchingDirections.IsOnWall || cliffDetection.colliders.Count == 0) && waitingCoroutine == null)
+            {
+                waitingCoroutine = StartCoroutine(WaitingToFlip(waitTimer));
+            }
+            if (!isWaiting && !animator.GetBool(AnimationStrings.hasTarget) && animator.GetBool(AnimationStrings.canMove))
+            {
+                rb.velocity = new Vector2(speed * moveDirectionVector.x, rb.velocity.y);
+            }
+            else if (!lockVelocity)
+            {
+                rb.velocity = new Vector2(0, rb.velocity.y);
+            }
 
-        if (Mathf.Abs(rb.velocity.x) > 0.15f)
-        {
-            IsMoving = true;
+            if (Mathf.Abs(rb.velocity.x) > 0.15f)
+            {
+                IsMoving = true;
+            }
+            else
+            {
+                IsMoving = false;
+            }
         }
-        else
+        
+
+    }
+    IEnumerator MovingSound()
+    {
+        while (IsMoving)
         {
-            IsMoving = false;
+            soundManager.PlayEnemyStep();
+           
+            yield return new WaitForSeconds(soundStepCD);
         }
+        
 
     }
     private void FlipDirection()
@@ -86,17 +106,20 @@ public class BaseEnemyMovement: MonoBehaviour
         {
             if (moveDirection != value)
             {
-                transform.localScale *= new Vector2(-1, 1);
+                
                 if (value == MovableDirection.Right)
                 {
                     moveDirectionVector = Vector2.right;
+                    transform.localScale = new Vector2(-1, 1);
                 }
                 else
                 {
                     moveDirectionVector = Vector2.left;
+                    transform.localScale = new Vector2(1, 1);
                 }
+                moveDirection = value;
             }
-            moveDirection = value;
+            
         }
     }
     public bool IsMoving
@@ -105,7 +128,19 @@ public class BaseEnemyMovement: MonoBehaviour
         set
         {
             if (IsMoving != value)
+            {
                 animator.SetBool(AnimationStrings.isMoving, value);
+                if (value && moveSoundCoroutine == null)
+                {
+                    moveSoundCoroutine = StartCoroutine(MovingSound());
+                }
+                else if (!value &&  moveSoundCoroutine != null)
+                {
+                    StopCoroutine(moveSoundCoroutine);
+                    moveSoundCoroutine = null;
+                }
+            }
+                
         }
     }
     public float Speed
@@ -114,6 +149,36 @@ public class BaseEnemyMovement: MonoBehaviour
         set
         {
             speed = value;
+        }
+    }
+    public float WaitTimer
+    {
+        get { return waitTimer; }
+        set
+        {
+            waitTimer = value;
+        }
+    }
+    public float SoundSTEPCD
+    {
+        get { return soundStepCD; }
+        set
+        {
+            if (soundStepCD != value)
+            {
+                if (moveSoundCoroutine != null)
+                {
+                    StopCoroutine(moveSoundCoroutine);
+                    moveSoundCoroutine= null;
+                }
+                
+                soundStepCD = value;
+                if (moveSoundCoroutine == null)
+                {
+                    StartCoroutine(MovingSound());
+                }
+                
+            }
         }
     }
     public enum MovableDirection

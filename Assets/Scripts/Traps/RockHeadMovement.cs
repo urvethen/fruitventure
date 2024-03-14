@@ -11,7 +11,7 @@ public class RockHeadMovement: MonoBehaviour
     [SerializeField] float speed;
     [SerializeField] Vector2 blinkMinMaxDelay = Vector2.zero;
     [SerializeField] LayerMask groundLayer;
-    bool isRight = true;
+    [SerializeField] bool isRight = true;
     bool isReady = true;
     //[SerializeField] Transform gfx;
     [SerializeField] Transform hitZone;
@@ -24,6 +24,7 @@ public class RockHeadMovement: MonoBehaviour
     List<MovementDirect> moveDirectLeft = new List<MovementDirect>() { MovementDirect.Left, MovementDirect.Bottom, MovementDirect.Right, MovementDirect.Top };
     Coroutine checkingWall;
     UIManager uiManager;
+    SoundManager soundManager;
     private void Awake()
     {
         if(!TryGetComponent<Animator>(out animator))
@@ -35,6 +36,7 @@ public class RockHeadMovement: MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
+        soundManager = SoundManager.Instance;
         StartCoroutine(Move());
         StartCoroutine(Blink());
         uiManager = UIManager.Instance;
@@ -59,6 +61,7 @@ public class RockHeadMovement: MonoBehaviour
                 if (wallDetection.IsOnWall)
                 {
                     Stop = true;
+                    soundManager.PlayStoneImpact();
                     if (isReady)
                         animator.SetTrigger(AnimationStrings.hit_right);
                 }
@@ -67,6 +70,7 @@ public class RockHeadMovement: MonoBehaviour
                 if (wallDetection.IsOnCeiling)
                 {
                     Stop = true;
+                    soundManager.PlayStoneImpact();
                     animator.SetTrigger(AnimationStrings.hit_top);
                 }
                 break;
@@ -74,6 +78,7 @@ public class RockHeadMovement: MonoBehaviour
                 if (wallDetection.IsGrounded)
                 {
                     Stop = true;
+                    soundManager.PlayStoneImpact();
                     animator.SetTrigger(AnimationStrings.hit_bot);
                 }
                 break;
@@ -89,13 +94,9 @@ public class RockHeadMovement: MonoBehaviour
             {
                 checkingWall = StartCoroutine(WathDog());
             }
-            //rb.position = rb.position + speed * GetDirect()*Time.fixedDeltaTime;
             rb.velocity = speed * GetDirect();
-            //transform.position = Vector3.MoveTowards(transform.position, transform.position + GetDirect(), speed * Time.fixedDeltaTime);
             if (stop)
             {
-               // rb.velocity = Vector2.zero;\
-                
                 break;
             }
             yield return null;
@@ -216,6 +217,7 @@ public class RockHeadMovement: MonoBehaviour
                 case MovementDirect.Bottom:
                     if (hitZone != null)
                     {
+                        IsRight = true;
                         hitZone.localScale = Vector3.one;
                         hitZone.rotation = Quaternion.Euler(0f, 0f, 270f);
                     }                    
@@ -233,6 +235,7 @@ public class RockHeadMovement: MonoBehaviour
                 case MovementDirect.Top:
                     if (hitZone != null)
                     {
+                        IsRight = true;
                         hitZone.localScale = Vector3.one;
                         hitZone.rotation = Quaternion.Euler(0f, 0f, 90f);
                     }

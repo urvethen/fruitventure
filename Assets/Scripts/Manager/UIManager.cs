@@ -20,9 +20,13 @@ public class UIManager: MonoBehaviour
     [SerializeField] GameObject menuButton;
     [SerializeField] List<string> questCollect = new List<string>();
     [SerializeField] List<string> questFinish = new List<string>();
+    [SerializeField] List<string> goalCollect = new List<string>();
+    [SerializeField] List<string> goalFinish = new List<string>();
     float timer = 0f;
     GameManager gameManager;
     CameraShake cameraShake;
+    SaveManager saveManager;
+    SoundManager soundManager;
     #region Синглтон
     public static UIManager _instance;
     public static UIManager Instance { get { return _instance; } }
@@ -53,7 +57,17 @@ public class UIManager: MonoBehaviour
     private void Start()
     {
         gameManager = GameManager.Instance;
+        saveManager = SaveManager.Instance;
         cameraShake = CameraShake.Instance;
+        soundManager = SoundManager.Instance;
+        if (saveManager.SoundOn)
+        {
+            soundButton.sprite = soundSprite[0];
+        }
+        else
+        {
+            soundButton.sprite = soundSprite[1];
+        }
     }
     private void ShowPanel()
     {
@@ -63,28 +77,28 @@ public class UIManager: MonoBehaviour
     public void PrepareFruitPanel(int count)
     {
         questPanel.gameObject.SetActive(true);
-        questPanel.GetComponentInChildren<TextMeshProUGUI>().text = questCollect[0];
-        goalText.text = "Осталось собрать: " + count;
+        questPanel.GetComponentInChildren<TextMeshProUGUI>().text = questCollect[saveManager.GetLocaliztionIndex];
+        goalText.text = goalCollect[saveManager.GetLocaliztionIndex] + count;
         Invoke("ShowPanel", 2f);
     }
     public void PrepareFruitPanel(string count)
     {
         questPanel.gameObject.SetActive(true);
-        goalText.text = "Осталось собрать: " + count;
+        goalText.text = goalCollect[saveManager.GetLocaliztionIndex] + count;
         Invoke("ShowPanel", 2f);
     }
     public void ChangeCounter(int count)
     {
-        goalText.text = "Осталось собрать: " + count;
+        goalText.text = goalCollect[saveManager.GetLocaliztionIndex] + count;
     }
     public void ChangeCounter(string count)
     {
-        goalText.text = "Осталось собрать: " + count;
+        goalText.text = goalCollect[saveManager.GetLocaliztionIndex] + count;
     }
     public void PrepareTimerPanel()
     {
         questPanel.gameObject.SetActive(true);
-        questPanel.GetComponentInChildren<TextMeshProUGUI>().text = questFinish[0];
+        questPanel.GetComponentInChildren<TextMeshProUGUI>().text = questFinish[saveManager.GetLocaliztionIndex];
         Invoke("ShowPanel", 1.5f);
         StartCoroutine(StartTimer());
     }
@@ -111,20 +125,33 @@ public class UIManager: MonoBehaviour
     }
     public void OnHomeButtonClick()
     {
+        soundManager.PlayCLick();
+        saveManager.SaveLevels();
         SceneManager.LoadScene(0);
     }
     public void OnResetButtonClick()
     {
+        soundManager.PlayCLick();
         gameManager.RestartLevel();
     }
     public void OnSoundButtonClick()
     {
-
+        soundManager.PlayCLick();
+        saveManager.SoundOn = !saveManager.SoundOn;
+        if (saveManager.SoundOn)
+        {
+            soundButton.sprite = soundSprite[0];
+        }
+        else
+        {
+            soundButton.sprite = soundSprite[1];
+        }
     }
     public void OnMenuButtonClick()
     {
         if (menuButton.activeSelf)
         {
+            soundManager.PlayCLick();
             StartCoroutine(ShowPanelButton());
             menuButton.SetActive(false);
         }
@@ -166,6 +193,7 @@ public class UIManager: MonoBehaviour
     }
     public void OnPauseButtonClick()
     {
+        soundManager.PlayCLick();
         gameManager.IsPaused = !gameManager.IsPaused;
         if (gameManager.IsPaused)
         {

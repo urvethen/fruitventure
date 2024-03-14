@@ -20,6 +20,7 @@ public class Arrow: MonoBehaviour
         Rigidbody2D rb = collision.gameObject.GetComponent<Rigidbody2D>();
         rb.velocity = new Vector2(rb.velocity.x, 0);
         */
+        SoundManager.Instance.PlayArrowInteract();
         UIManager.Instance.ShakeCamera();
         collision.gameObject.GetComponent<PlayerMovement>().ForceJumpByAngle(transform.rotation.eulerAngles.z + 90f, power);
         animator.SetTrigger(AnimationStrings.hit);

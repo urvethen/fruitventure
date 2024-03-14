@@ -15,7 +15,7 @@ public class Fan : MonoBehaviour
     ParticleSystem particle;
     ParticleSystem.MainModule mainParticle;
     BoxCollider2D mainCollider;
-
+    AudioSource audioSource;
     private void OnEnable()
     {
         particle = GetComponentInChildren<ParticleSystem>();
@@ -34,7 +34,7 @@ public class Fan : MonoBehaviour
     {
         
         animator = GetComponent<Animator>();
-        
+        audioSource = GetComponent<AudioSource>();
         mainCollider = GetComponent<BoxCollider2D>();
         float angle = transform.rotation.eulerAngles.z;
         switch (angle)
@@ -62,6 +62,7 @@ public class Fan : MonoBehaviour
         mainCollider.size = new Vector2(mainCollider.size.x, size);
         mainCollider.offset = new Vector2(0, size/2);
         mainParticle.startSpeed = size;
+        
         if (alwaysOn)
         {
             StartCoroutine(FanOn());
@@ -84,7 +85,7 @@ public class Fan : MonoBehaviour
     {
         animator.SetBool(AnimationStrings.start, true);
         mainCollider.enabled = true;
-       
+        audioSource.Play();
         if (!alwaysOn)
         {
             particle.Play();
@@ -102,6 +103,7 @@ public class Fan : MonoBehaviour
     {
         animator.SetBool(AnimationStrings.start, false);
         mainCollider.enabled= false;
+        audioSource.Stop();
         //  particle.Stop();
         if (!alwaysOn)
         {

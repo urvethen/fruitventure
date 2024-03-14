@@ -621,6 +621,7 @@ MonoBehaviour:
   moveDirectionVector: {x: -1, y: 0}
   touchingDirections: {fileID: 40573597372572633}
   isMoving: 0
+  soundStepCD: 0.3
 --- !u!70 &8266718415329328089
 CapsuleCollider2D:
   m_ObjectHideFlags: 0

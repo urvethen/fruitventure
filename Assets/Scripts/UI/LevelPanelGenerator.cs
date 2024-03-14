@@ -13,21 +13,24 @@ public class LevelPanelGenerator: MonoBehaviour
     [SerializeField] Transform panelMain, panelLvl;
     [SerializeField] TranslationManager translationManager;
     [SerializeField] Scrollbar scrollbar;
-    
+    [SerializeField] Sprite unenableButtSprite;
+    SoundManager soundManager;
+    string levels;
+    SaveManager saveManager;
     void Start()
     {
+        soundManager = SoundManager.Instance;
+        saveManager = SaveManager.Instance;
+        levels = saveManager.GetLevels;
         ClearButton();
         CreateButton();
         scrollbar.value = 1.0f;
     }
 
-    // Update is called once per frame
-    void Update()
-    {
-
-    }
+    
     public void OnBackButtonClick()
     {
+        soundManager.PlayCLick();
         panelMain.gameObject.SetActive(true);
         gameObject.SetActive(false);
     }
@@ -48,13 +51,25 @@ public class LevelPanelGenerator: MonoBehaviour
         {
             Button butt = Instantiate(buttonPrefab, container).GetComponent<Button>();
             int index = i;
-            print("Create butt ¹" + i + "with index " + index);
-            butt.onClick.AddListener(() => { StartLoadLevel(index); });
-            butt.GetComponentInChildren<TextMeshProUGUI>().text = index.ToString();            
+            print(levels.Length);
+            if (levels[i-1] == 'A')
+            {
+                butt.onClick.AddListener(() => { StartLoadLevel(index); });
+                butt.GetComponentInChildren<TextMeshProUGUI>().text = index.ToString();
+            }
+            else
+            {
+                butt.enabled = false;
+                butt.GetComponentInChildren<TextMeshProUGUI>().text = index.ToString();
+                butt.transform.GetComponent<Image>().sprite = unenableButtSprite;
+            }
+           // print("Create butt ¹" + i + "with index " + index);
+                      
         }
     }
     private void StartLoadLevel(int lvl)
     {
+        soundManager.PlayCLick();
         StartCoroutine(LoadScene(lvl));
 
         SaveManager manager = SaveManager.Instance;

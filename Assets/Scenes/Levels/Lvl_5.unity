@@ -843,8 +843,13 @@ MonoBehaviour:
   menuButton: {fileID: 90782075}
   questCollect:
   - "\u0421\u043E\u0431\u0435\u0440\u0438 \u0432\u0441\u0435 \u0444\u0440\u0443\u043A\u0442\u044B"
+  - Collect all fruits!
   questFinish:
   - "\u0424\u0438\u043D\u0438\u0448\u0438\u0440\u0443\u0439"
+  goalCollect:
+  - "\u041E\u0441\u0442\u0430\u043B\u043E\u0441\u044C \u0441\u043E\u0431\u0440\u0430\u0442\u044C: "
+  - 'Left to collect: '
+  goalFinish: []
 --- !u!4 &570981486
 Transform:
   m_ObjectHideFlags: 0
@@ -3895,6 +3900,24 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b626692b04fff464a8fee157b43eb505, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  prefabSound: {fileID: 0}
+  clickClip: {fileID: 0}
+  audioCollectList: []
+  audioDeathList: []
+  victoryClip: {fileID: 0}
+  mainMenuTheme: {fileID: 0}
+  bgMusicList: []
+  playerSpawnClip: {fileID: 0}
+  jumpClip: {fileID: 0}
+  enemyStepClip: {fileID: 0}
+  playerStepClip: {fileID: 0}
+  playersDeathClip: {fileID: 0}
+  boxIntectactClip: {fileID: 0}
+  blockInteractClip: {fileID: 0}
+  trampolineInteractClip: {fileID: 0}
+  arrowInteractClip: {fileID: 0}
+  windClip: {fileID: 0}
+  fireClip: {fileID: 0}
 --- !u!4 &1454864259
 Transform:
   m_ObjectHideFlags: 0
@@ -18908,6 +18931,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a84cf366ae0f292439b95c8215556d2a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  lastLvl: 1
+  levels: 
+  fruitCounter: 0
+  localization: 0
 --- !u!1001 &2081768343
 PrefabInstance:
   m_ObjectHideFlags: 0

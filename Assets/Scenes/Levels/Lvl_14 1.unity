@@ -515,7 +515,10 @@ MonoBehaviour:
   questCollect:
   - "\u0421\u043E\u0431\u0435\u0440\u0438 \u0432\u0441\u0435 \u0444\u0440\u0443\u043A\u0442\u044B"
   questFinish:
-  - "\u0424\u0438\u043D\u0438\u0448\u0438\u0440\u0443\u0439"
+  - "\u0424\u0438\u043D\u0438\u0448\u0438\u0440\u0443\u0439!"
+  - Finish!
+  goalCollect: []
+  goalFinish: []
 --- !u!4 &570981486
 Transform:
   m_ObjectHideFlags: 0
@@ -24636,6 +24639,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   lastLvl: 1
+  levels: 
+  fruitCounter: 0
+  localization: 0
 --- !u!1001 &1931503198
 PrefabInstance:
   m_ObjectHideFlags: 0

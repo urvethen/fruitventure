@@ -195,6 +195,9 @@ MonoBehaviour:
   moveDirectionVector: {x: -1, y: 0}
   isWaiting: 0
   cliffDetection: {fileID: 4802506434808004127}
+  waitTimer: 0.75
+  lockVelocity: 0
+  soundStepCD: 0.3
 --- !u!50 &8100134291760076639
 Rigidbody2D:
   serializedVersion: 4

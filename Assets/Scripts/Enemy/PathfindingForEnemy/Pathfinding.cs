@@ -7,7 +7,7 @@ public class Pathfinding: MonoBehaviour
 {
     //!Базовый файл для поиска пути в ширину на объекте
     [Header("Создание путевых точек")]
-    [SerializeField] Vector2Int worldSize;
+    [SerializeField] Vector2Int worldSize = new Vector2Int (19,11);
     [SerializeField] GameObject waypointsPrefab;
     [SerializeField] Transform waypoints;
     [SerializeField] List<Tilemap> tilemaps = new List<Tilemap>();
@@ -50,16 +50,17 @@ public class Pathfinding: MonoBehaviour
     }
     public List<Vector3> CreateRoute(Vector3 startPoint, Vector3 endPoint)
     {
+        //ClearWaypoints();
         List<Vector3> route = new List<Vector3>();
-        startKey = (Vector2Int)tilemaps[0].WorldToCell(startPoint);
-        endKey = (Vector2Int)tilemaps[0].WorldToCell(endPoint);        
+        startKey = FindClosestEmptyTile(startPoint);
+        endKey = FindClosestEmptyTile(endPoint);        
         if (levelMaps.ContainsKey(startKey) && levelMaps.ContainsKey(endKey))
         {
             
             isRunning = true;
             StartPathfinding();
             CreateRoad();
-            route = CreateRoute();
+            route = FinishRoute();
             ClearWaypoints();
         }
         else
@@ -67,10 +68,11 @@ public class Pathfinding: MonoBehaviour
             Debug.LogWarning("По точкам маршрута не найдены клетки маршрута, укажите другие точки");
         }
         return route;
-    }    
+    }
+    #region Поиск пути
     private void StartPathfinding()
     {
-        waypointsQueue.Clear();
+        //waypointsQueue.Clear();
         //ExploreNearPoints(startKey);
         waypointsQueue.Enqueue(levelMaps[startKey]);
         while (waypointsQueue.Count > 0 && isRunning == true)
@@ -100,30 +102,36 @@ public class Pathfinding: MonoBehaviour
             if (levelMaps.ContainsKey(nearPoints) && !waypointsQueue.Contains(levelMaps[nearPoints]) && !levelMaps[nearPoints].isExplored)
             {
                 waypointsQueue.Enqueue(levelMaps[nearPoints]);
-                levelMaps[nearPoints].eploredFrom = levelMaps[key];               
+                levelMaps[nearPoints].exploredFrom = levelMaps[key];               
             }
         }
     }
     private void CreateRoad()
     {
         waypointsRoad.Add(levelMaps[endKey]);
-
-        while (true)
+       
+        if (levelMaps[endKey].exploredFrom != null)
         {
-            Waypoint previous = waypointsRoad[waypointsRoad.Count - 1].eploredFrom;
-            waypointsRoad.Add(previous);
-            if (previous == levelMaps[startKey])
+            while (true)
             {
-                break;
-            }
-            else
-            {
+                Waypoint previous = waypointsRoad[waypointsRoad.Count - 1].exploredFrom;
+                //waypointsRoad[waypointsRoad.Count - 1].exploredFrom = null;
                
+                waypointsRoad.Add(previous);
+                if (previous == levelMaps[startKey])
+                {
+                    break;
+                }
+                else
+                {
+
+                }
             }
         }
+        
         waypointsRoad.Reverse();
     }
-    private List<Vector3> CreateRoute()
+    private List<Vector3> FinishRoute()
     {
         List<Vector3> route = new List<Vector3>();
         for (int i = 0; i < waypointsRoad.Count; i++)
@@ -134,15 +142,52 @@ public class Pathfinding: MonoBehaviour
     }
     private void ClearWaypoints()
     {
+        waypointsQueue.Clear();
+        waypointsRoad.Clear();
         foreach (var waypoint in levelMaps.Values)
         {
             if (waypoint.isExplored)
             {
-                waypoint.eploredFrom = null;
+                waypoint.exploredFrom = null;
                 waypoint.isExplored = false;
             }
         }
     }
+    #endregion
+    public Vector2Int FindClosestEmptyTile(Vector3 worldPosition)
+    {
+        Vector2Int startKey = (Vector2Int)tilemaps[0].WorldToCell(worldPosition); // Получаем ячейку тайлмапа для указанной позиции
+
+        Queue<Vector2Int> queue = new Queue<Vector2Int>(); // Очередь для BFS
+        HashSet<Vector2Int> visited = new HashSet<Vector2Int>(); // Множество посещенных ячеек
+
+        queue.Enqueue(startKey);
+        visited.Add(startKey);
+
+        while (queue.Count > 0)
+        {
+            Vector2Int currentKey = queue.Dequeue();
+
+            if (levelMaps.ContainsKey(currentKey)) // Проверяем, является ли текущий тайл пустым
+            {
+                return currentKey; // Если нашли пустой тайл, возвращаем его позицию
+            }
+
+            // Добавляем соседние ячейки в очередь для дальнейшего поиска
+            foreach (var offset in directions)
+            {
+                Vector2Int neighbor = currentKey + offset;
+                if (!visited.Contains(neighbor))
+                {
+                    queue.Enqueue(neighbor);
+                    visited.Add(neighbor);
+                }
+            }
+        }
+        Debug.LogWarning("Не найдена точка старта/финиша");
+        return startKey; // Если не удалось найти пустой тайл, возвращаем исходную позицию
+    }
+
 
     #region Создание поля точек
     private void CreateWaypoints()

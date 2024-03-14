@@ -18,26 +18,35 @@ public class PlayerMovement: MonoBehaviour
     [SerializeField] ParticleSystem runningParticle, jumpParticle;
     [SerializeField] Transform runningParticleTransform;
     [SerializeField]ParticleSystemRenderer runningParticleRenderer, jumpParticleRenderer;
-    
+    [SerializeField] float soundStepCD = 0.4f;
     [SerializeField] List<Sprite> dustList;
     Rigidbody2D rb;
     [SerializeField]Transform gfxHolder;
     [SerializeField] List<Material> materialList = new List<Material>();
+    [SerializeField] List<GameObject> gfxPrefab = new List<GameObject>();
     Vector2 currentIceSpeed;
     Animator animator;
     TouchingDirections touchingDirections;
     GameManager gameManager;
-    Coroutine lockingVelocityCoroutine, resetJumpCounterCoroutine, forceJumpCoroutine, runninCoroutine;
+    SoundManager soundManager;
+    Coroutine lockingVelocityCoroutine, resetJumpCounterCoroutine, forceJumpCoroutine, runninCoroutine, stepSoundCoroutine;
+    float elapsedTimeToCallSound = 0f;
+    bool oneCall = true;
     private void Awake()
     {
-        rb = GetComponent<Rigidbody2D>();
-        animator = GetComponentInChildren<Animator>();
-        touchingDirections = GetComponent<TouchingDirections>();
+        Instantiate(gfxPrefab[3],transform.position, Quaternion.identity ,transform.GetChild(0));
+        
+        
         //gfxHolder = transform.GetChild(1);
     }
     void Start()
     {
+        gfxHolder = transform.GetChild(1);
+        rb = GetComponent<Rigidbody2D>();
+        animator = GetComponentInChildren<Animator>();
+        touchingDirections = GetComponent<TouchingDirections>();
         gameManager = GameManager.Instance;
+        soundManager = SoundManager.Instance;
     }
 
 
@@ -45,8 +54,7 @@ public class PlayerMovement: MonoBehaviour
     {
         if (IsSliding && touchingDirections.OnSwamp && !lockVelocity)
         {
-            rb.bodyType = RigidbodyType2D.Kinematic;
-            
+            rb.bodyType = RigidbodyType2D.Kinematic;            
             rb.velocity = Vector2.zero;
         }
         else
@@ -96,8 +104,6 @@ public class PlayerMovement: MonoBehaviour
         if (touchingDirections.IsGrounded && (touchingDirections.OnSwamp || touchingDirections.OnSand))
         {
             gfxHolder.transform.localPosition = new Vector3(0, -0.2f, 0);
-            
-
         }
         else if (touchingDirections.IsOnWall && touchingDirections.OnSwamp)
         {
@@ -133,6 +139,19 @@ public class PlayerMovement: MonoBehaviour
                 StartCoroutine(SwapMaterial(0.01f));
             }
         }
+        if (touchingDirections.IsGrounded && IsMoving && !touchingDirections.IsOnWall&& CanMove  &&stepSoundCoroutine == null && oneCall)
+        {
+            elapsedTimeToCallSound += Time.fixedDeltaTime;
+            if(elapsedTimeToCallSound > soundStepCD)
+            {
+                soundManager.PlayPlayerStep();
+                elapsedTimeToCallSound = 0;
+            }
+        }
+        else
+        {
+            elapsedTimeToCallSound = 0;            
+        }
     }
 
     IEnumerator SwapMaterial(float delay)
@@ -166,6 +185,7 @@ public class PlayerMovement: MonoBehaviour
             if (touchingDirections.IsGrounded)
             {
                 jumpParticle.Play();
+                soundManager.PlayJump();
                 rb.velocity = new Vector2(rb.velocity.x, jumpPower);
                 StartLockingVelocity(jumpFromWallTimer);
                 //StartCoroutine(DeleyBeforeRisingJumpCounter());
@@ -175,6 +195,7 @@ public class PlayerMovement: MonoBehaviour
             else if (!touchingDirections.IsGrounded && IsSliding)
             {
                 jumpParticle.Play();
+                soundManager.PlayJump();
                 IsRight = !IsRight;
                 rb.velocity = new Vector2(0.7f * transform.localScale.x * jumpPower, jumpPower);
                 StartLockingVelocity(jumpFromWallTimer);
@@ -185,6 +206,7 @@ public class PlayerMovement: MonoBehaviour
             else if (JumpCounter < 2)
             {
                 jumpParticle.Play();
+                soundManager.PlayJump();
                 rb.velocity = new Vector2(rb.velocity.x, jumpPower);
                 StartLockingVelocity(jumpFromWallTimer);
                 JumpCounter += 2;
@@ -227,10 +249,7 @@ public class PlayerMovement: MonoBehaviour
             angle += 360;
         }
         float angleInRadians = angle * Mathf.Deg2Rad;
-        Vector2 forceDirection = new Vector2(Mathf.Sin(angleInRadians), Mathf.Cos(angleInRadians));
-        print(Mathf.Cos(angleInRadians));
-        print(Mathf.Rad2Deg * Mathf.Acos(angleInRadians));
-        print(Mathf.Rad2Deg * Mathf.Asin(angleInRadians));
+        Vector2 forceDirection = new Vector2(Mathf.Sin(angleInRadians), Mathf.Cos(angleInRadians));       
         rb.velocity = new Vector2(0 + Mathf.Cos(angleInRadians) * force.x, 0 + Mathf.Sin(angleInRadians) * force.y);
         jumpParticle.Play();
         StartLockingVelocity(0.2f);
@@ -289,12 +308,12 @@ public class PlayerMovement: MonoBehaviour
     }
     IEnumerator Fall()
     {
-        print("check");
+        
         Physics2D.IgnoreLayerCollision(7, 9, true);
        
         yield return new WaitForSeconds(0.3f);
         Physics2D.IgnoreLayerCollision(7, 9, false);
-        print("check end");
+        
     }
     #endregion
     public void OnMove(InputAction.CallbackContext cntx)
@@ -354,6 +373,17 @@ public class PlayerMovement: MonoBehaviour
         }
         return false;
     }
+    IEnumerator MovingSound()
+    {
+        while (true)
+        {
+            soundManager.PlayPlayerStep();
+
+            yield return new WaitForSeconds(soundStepCD);
+        }
+
+
+    }
     #region Аксессоры
     public bool IsMoving
     {
@@ -365,7 +395,7 @@ public class PlayerMovement: MonoBehaviour
                 isMoving = value;
 
                 animator.SetBool(AnimationStrings.isMoving, value);
-
+                
 
             }
 
@@ -457,6 +487,7 @@ public class PlayerMovement: MonoBehaviour
         {
             if(!gameManager.IsWin)
             {
+                soundManager.PlayersDeath();
                 rb.velocity = Vector2.zero;
                 rb.bodyType = RigidbodyType2D.Static;
                 GetComponent<Collider2D>().enabled = false;

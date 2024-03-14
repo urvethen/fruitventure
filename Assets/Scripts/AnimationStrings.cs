@@ -18,7 +18,7 @@ internal class AnimationStrings
 
     internal static string yVelocity = "yVelocity";
 
-
+    internal static string jump = "jump";
 
     internal static string fruitNumber = "fruitNumber";
     internal static string isCollected = "isCollected";
@@ -38,5 +38,8 @@ internal class AnimationStrings
 
     internal static string hasTarget = "hasTarget";
     internal static string attack = "attack";
+    internal static string hide = "hide";
+    internal static string show = "show";
+    internal static string needSound = "needSound";
 
 }

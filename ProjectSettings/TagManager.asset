@@ -28,7 +28,7 @@ TagManager:
   - EnemyHitZone
   - EnemyDetectionZone
   - EnemyBullet
-  - 
+  - OnlyEnemyCollision
   - 
   - 
   - 

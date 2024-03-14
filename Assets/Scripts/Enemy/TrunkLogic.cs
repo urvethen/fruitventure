@@ -10,6 +10,7 @@ public class TrunkLogic: BaseEnemyLogic
     [SerializeField] bool attackReady;
     [SerializeField] Transform attackPoint;
     Coroutine attackCoroutine;
+    SoundManager sound;
     public void OnAttack()
     {
 
@@ -19,14 +20,17 @@ public class TrunkLogic: BaseEnemyLogic
         }
 
     }
-
+    private void Start()
+    {
+        sound = SoundManager.Instance;
+    }
     public void Attack()
     {
         Vector3 rotation = transform.localScale.x > 0 ? new Vector3(0, 0, 0) : new Vector3(0, 0, 180f);
         GameObject bullet = Instantiate(prefabBullet, attackPoint.position, Quaternion.Euler(rotation));
         bullet.GetComponent<Rigidbody2D>().velocity = transform.localScale.x > 0 ? bulletSpeed * Vector2.left : bulletSpeed *  Vector2.right;
-
-
+        //!Звук атаки
+        sound.PlayAttack();
     }
     IEnumerator AttackRepeatly()
     {

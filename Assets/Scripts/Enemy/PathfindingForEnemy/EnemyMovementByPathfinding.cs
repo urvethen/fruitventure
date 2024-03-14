@@ -4,14 +4,19 @@ using UnityEngine;
 
 public class EnemyMovementByPathfinding : MonoBehaviour
 {
-    [SerializeField] Transform main;
-    [SerializeField] Transform startPoint, endPoint;
-    [SerializeField] List<Vector3> route = new List<Vector3>();
-    [SerializeField] Pathfinding pathfinding;
-    [SerializeField] Animator animator;
-    [SerializeField] float speed = 1f;
-    int index = 0;
-    void Start()
+    [SerializeField] protected Transform main;
+    [SerializeField] protected Transform startPoint, endPoint;
+    [SerializeField] protected List<Vector3> route = new List<Vector3>();
+    [SerializeField] protected Pathfinding pathfinding;
+    [SerializeField] protected Animator animator;
+    [SerializeField] protected float speed = 1f;
+    [SerializeField]protected int index = 0;
+   
+    protected virtual void Start()
+    {
+        StartMovement();
+    }
+    protected virtual void StartMovement()
     {
         RouteRequest();
         FindNearestPointInRoute();
@@ -47,11 +52,12 @@ public class EnemyMovementByPathfinding : MonoBehaviour
         {
             main.localScale = new Vector3(-1, 1, 1);
         }
-        while (distance > 0.1f)
+        while (distance > 0.01f)
         {
             
             main.position = Vector3.MoveTowards(main.position, B, Time.deltaTime * speed);
             distance = Vector3.Distance(main.position, B);
+            
             yield return null;
             if (!IsAlive)
                 break;
@@ -59,16 +65,23 @@ public class EnemyMovementByPathfinding : MonoBehaviour
         if (index+1 < route.Count - 1)
         {
             index++;
+            if (IsAlive)
+                StartCoroutine(Move(route[index], route[index + 1]));
         }
         else
         {
-            index = 0;
-            route.Reverse();
+            EndRoute();
         }
-        if(IsAlive)
-        StartCoroutine(Move(route[index], route[index+1]));
+        
     }
     
+    protected virtual void EndRoute()
+    {
+        index = 0;
+        route.Reverse();
+        if (IsAlive)
+            StartCoroutine(Move(route[index], route[index + 1]));
+    }
     private bool IsAlive
     {
         get

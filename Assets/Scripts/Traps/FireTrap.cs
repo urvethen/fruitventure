@@ -7,9 +7,11 @@ public class FireTrap: MonoBehaviour
     [SerializeField] float timer = 5f;
     [SerializeField] float prepareTimer = 0.5f;
     Animator animator;
+    AudioSource audioSource;
     private void Awake()
     {
         animator = GetComponent<Animator>();
+        audioSource = GetComponent<AudioSource>();
     }
 
     private void OnCollisionEnter2D(Collision2D collision)
@@ -33,8 +35,10 @@ public class FireTrap: MonoBehaviour
     }
     IEnumerator Fire()
     {
+        audioSource.Play();
         Hit = true;
         yield return new WaitForSeconds(timer);
+        audioSource.Stop();
         Hit = false;
         Start = false;
         IsReady = true;

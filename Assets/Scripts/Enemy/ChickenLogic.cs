@@ -17,10 +17,12 @@ public class ChickenLogic: MonoBehaviour
     [SerializeField] Vector2 moveDirectionVector = Vector2.left;
     [SerializeField] TouchingDirections touchingDirections;
     [SerializeField] bool isMoving = false;
+    [SerializeField] float soundStepCD = 0.2f;
+    SoundManager soundManager;
     // Start is called before the first frame update
     void Start()
     {
-
+        soundManager = SoundManager.Instance;
     }
 
     // Update is called once per frame
@@ -72,6 +74,7 @@ public class ChickenLogic: MonoBehaviour
                     ChooseDirection();
                     IsMoving = true;
                     animator.SetBool(AnimationStrings.hasTarget, true);
+                    StartCoroutine(MovingSound());
                     //todo Запускаем бег
                 }
             }
@@ -97,8 +100,20 @@ public class ChickenLogic: MonoBehaviour
             player = null;
             animator.SetBool(AnimationStrings.hasTarget, false);
             IsMoving = false;
+            StopCoroutine(MovingSound());
             //todo Останавливаем бег
         }
+
+    }
+    IEnumerator MovingSound()
+    {
+        while (IsMoving&&animator.GetBool(AnimationStrings.canMove))
+        {
+            soundManager.PlayEnemyStep();
+
+            yield return new WaitForSeconds(soundStepCD);
+        }
+
 
     }
     public MovableDirection MoveDirection
